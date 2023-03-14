@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -17,27 +18,36 @@ public class GameManager : MonoBehaviour
     private float minZ = -4f;
 
     //GAME
-    public bool isGameOver = false;
-    public int points = 0;
-    public bool hasBeenClick = false;
+    private bool isGameOver = false;
+    private int points = 0;
+    private bool hasBeenClick = false;
     private int lives = 3;
+    private const int MAXLIVES = 5;
+    private float timer = 2f;
 
     //COMPONENTS
     private Material _material;
     
-    public AudioSource _audio;
+    private AudioSource _audio;
     public AudioClip hitSound;
+    public AudioClip missSound;
 
-    public TextMeshProUGUI livesText; 
+    public TextMeshProUGUI livesText;
+    public TextMeshProUGUI scoreText;
+
+    public GameObject gameOverPanel;
 
 
     // Start is called before the first frame update
     void Start()
     {
         lives = 3;
-        SetText($"LIVES: {lives}");
+        SetText(livesText, $"Lives: {lives}");
         points = 0;
+        SetText(scoreText, $"Score\n{points}");
         hasBeenClick = false;
+        timer = 2f;
+
         StartCoroutine(GenerateNextRandomPos());
         _material = GetComponent<Renderer>().material;
         _audio = GetComponent<AudioSource>();
@@ -45,19 +55,19 @@ public class GameManager : MonoBehaviour
 
     private void OnMouseDown()
     {    
-        if (!hasBeenClick) {
-            _material.color = Color.green; //Chnage color to green
+        if (!hasBeenClick && !isGameOver) {
+            
+            if (lives < MAXLIVES){
+                lives++;
+                SetText(livesText, $"Lives: {lives}");
+            }
+            _material.color = Color.green; //Change color to green
             points++; //Increase points
-            _audio.PlayOneShot(hitSound, 1);
+            SetText(scoreText, $"Score\n{points}");
+            _audio.PlayOneShot(hitSound, 1f);
             hasBeenClick = true;
         }
        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     //Function that returns a Random Position
@@ -70,19 +80,16 @@ public class GameManager : MonoBehaviour
     private IEnumerator GenerateNextRandomPos() {
 
         while (!isGameOver) {
-            yield return new WaitForSeconds(2);
-            
+            yield return new WaitForSeconds(timer);
             //Check lifes
             if (!hasBeenClick) {
-                //lives--;
-                if (--lives <= 0)
+                lives--;
+                SetText(livesText, $"Lives: {lives}");
+                _audio.PlayOneShot(missSound, 1f); //Play miss sound
+                if (lives <= 0)
                 {
-                    SetText($"LIVES: {lives}");
-                    isGameOver = true;
+                    GameOver();
                     break; //Cut execution
-                }
-                else {
-                    SetText($"LIVES: {lives}");
                 }
             }
 
@@ -90,10 +97,26 @@ public class GameManager : MonoBehaviour
             transform.position = GenerateRandomPos();
             _material.color = Color.blue;
             hasBeenClick = false;
+            timer = Random.Range(1f, 2.5f); //Get a random wait time
         }
     }
 
-    public void SetText(string text) {
-        livesText.text = text;
-    } 
+    //Function that given a text field display the text desired
+    private void SetText(TextMeshProUGUI field,string text) {
+        field.text = text;
+    }
+
+    //Function that manages Game Over
+    public void GameOver() {
+        _material.color = Color.gray; //Set game over color
+        _audio.Stop();
+        gameOverPanel.SetActive(true);
+        isGameOver = true;
+    }
+
+    //Function that Restart game
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name); //Load same scene
+    }
 }
