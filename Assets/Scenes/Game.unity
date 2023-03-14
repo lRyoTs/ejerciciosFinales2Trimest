@@ -604,10 +604,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 578e8964086283d44a876f24d6ae6ab8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isGameOver: 0
-  points: 0
-  hasBeenClick: 0
-  _audio: {fileID: 0}
   hitSound: {fileID: 8300000, guid: ae4679a4e5636384bbf4076eca0006e4, type: 3}
   missSound: {fileID: 8300000, guid: 82a35bd9d56d23f4c93a9cc235f30192, type: 3}
   livesText: {fileID: 882379285}
@@ -744,7 +740,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 5, y: 0}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &882379285
